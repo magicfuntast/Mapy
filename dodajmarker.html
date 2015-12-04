@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
+<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"pl-PL\">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>Dodaj Marker</title>
+	
+	<link rel="stylesheet" href="style.css" type="text/css" />
+	<link rel="stylesheet" href="css/fontello.css" type="text/css" />
+   <script src='http://maps.google.com/maps?file=api&amp;v=2.x&amp;sensor=false&amp;key=ABQIAAAAskA3kyDm631CGf6Rw_GrbBRBRXpdM9jp6G1MF9yLMfWuIYZt2BR5Ltrn1m4MP2hliyyWcC1AqLxZ3A' type='text/javascript'></script> 
+	<script type="text/javascript">
+
+	 var mapa;		
+		var marker;
+		
+		var ikona = new GIcon();  
+		ikona.image = "http://maps.google.com/mapfiles/kml/pal2/icon10.png";  
+		ikona.iconAnchor = new GPoint(16, 16);
+		ikona.shadow = "";  
+		ikona.infoWindowAnchor = new GPoint(16,16);  
+		ikona.iconSize = new GSize(32, 32);  
+				
+		function pobierzWartosc(obiektRadio)
+		{
+			if(!obiektRadio)
+				return null;
+			var ilosc = obiektRadio.length;
+			if(ilosc == undefined)
+				if(obiektRadio.checked)
+					return obiektRadio.value;
+			else
+				return null;
+			for(var i=0; i<ilosc; i++)
+			{
+				if(obiektRadio[i].checked)
+				{
+					return obiektRadio[i].value;
+				}
+			}
+			return null;
+		}				
+				
+		function load()
+		{
+			if(GBrowserIsCompatible())  
+			{				
+				mapa = new GMap2(document.getElementById("map"));
+				
+				mapa.setCenter(new GLatLng(52.348763181988076, 18.61083984375), 5, G_HYBRID_MAP);
+				mapa.addControl(new GLargeMapControl());  
+				mapa.addControl(new GMapTypeControl()); 
+
+				marker = new GMarker(mapa.getCenter(),{icon: ikona, draggable: true});
+				marker.opis = 'bez opisu';
+				mapa.addOverlay(marker);
+				
+				// zdarzenia dla markera
+				GEvent.addListener(marker,'drag',uaktualnijWspolrzedne);
+				GEvent.addListener(marker,'click',function()
+				{
+					marker.openInfoWindowHtml(marker.opis);
+				});
+				GEvent.trigger(marker,'drag');
+				uaktualnijDymek()
+				
+				// zdarzenia dla mapy
+				GEvent.addListener(mapa,'click',function(o,p)
+				{
+					if(p)
+					{
+						marker.setPoint(p);
+						uaktualnijWspolrzedne();
+					}
+				});
+			}
+		}
+		
+		function uaktualnijWspolrzedne()
+		{
+			var input_lat = document.getElementById('lat');
+			var input_lng = document.getElementById('lng');
+			var punkt = marker.getLatLng();
+			
+			input_lat.value = punkt.lat();
+			input_lng.value = punkt.lng();
+		}
+		
+		function uaktualnijIkone()
+		{
+			var url = pobierzWartosc(document.forms['formularz'].elements['ikona']);
+			marker.setImage(url);
+			uaktualnijDymek()
+		}
+		
+		function uaktualnijDymek()
+		{
+			var url = pobierzWartosc(document.forms['formularz'].elements['ikona']);
+			var tytul = document.getElementById('nazwa').value;
+			var opis = document.getElementById('opis').value;
+			
+			var html = '<img src="'+url+'" alt="" style="float: right; border: 0;" /><h3 class="marker">'+tytul+'</h3><p class="marker">'+opis+'</p>';
+			marker.opis = html;
+			if(mapa.getInfoWindow() && !mapa.getInfoWindow().isHidden())
+				GEvent.trigger(marker,'click');
+		}
+
+    function odliczanie()
+	{
+	var dzisiaj = new Date();
+		
+		var godzina = dzisiaj.getHours();
+		if (godzina<10) godzina = "0"+godzina;
+		
+		var minuta = dzisiaj.getMinutes();
+		if (minuta<10) minuta = "0"+minuta;
+		
+		var sekunda = dzisiaj.getSeconds();
+		if (sekunda<10) sekunda = "0"+sekunda;
+		
+		document.getElementById("zegar").innerHTML = godzina+":"+minuta+":"+sekunda;
+		 
+		 setTimeout("odliczanie()",1000);
+	}
+	
+ </script>
+ 
+  </head>
+	
+<body onload= "odliczanie();load();" onunload='GUnload()'>
+	
+	<div id="container">
+	
+		<div class="reactangle">
+			<div id="logo"><a href="https://www.bandi.pl" class="tilelinkhtml5">BANDI</a></div>
+			<div id="zegar">12:00:00</div>
+			<div style="clear: both;"></div>
+		</div>
+	
+	<div id="form">
+	<form action="dodajdane.php" method="post" id="formularz">
+	<fieldset><legend>współrzędne</legend>
+	<input type="text" class="disabled" readonly="readonly" id="lat" name="lat" /><br /><span
+	class="opis">długość geograficzna</span><br /><br />
+	<input type="text" class="disabled" readonly="readonly" id="lng" name="lng" /><br /><span class="opis">szerokość geograficzna</span><br />
+	Kliknij w wybranym punkcie mapy lub przeciągnij marker w żądane miejsce.
+	</fieldset>
+	<fieldset><legend>dane markera</legend>
+	<input onkeyup="uaktualnijDymek()" type="text" id="nazwa" name="nazwa" value="nazwa markera" /><br /><span class="opis">nazwa markera</span><br /><br />
+	<textarea onkeyup="uaktualnijDymek()" id="opis" name="opis">opis markera</textarea><br /><span class="opis">opis markera</span><br /><br />
+	<input onclick="uaktualnijIkone()" type="radio" name="ikona" id="ikona1" value="http://maps.google.com/mapfiles/kml/pal2/icon10.png" checked="checked" /><img style="border: 0;" alt="ikona1" src="http://maps.google.com/mapfiles/kml/pal2/icon10.png" /> 
+	<input onclick="uaktualnijIkone()" type="radio" name="ikona" id="ikona2" value="http://maps.google.com/mapfiles/kml/pal2/icon11.png" /><img style="border: 0;" alt="ikona2" src="http://maps.google.com/mapfiles/kml/pal2/icon11.png" /> 
+	<input onclick="uaktualnijIkone()" type="radio" name="ikona" id="ikona3" value="http://maps.google.com/mapfiles/kml/pal2/icon12.png"/><img style="border: 0;" alt="ikona3" src="http://maps.google.com/mapfiles/kml/pal2/icon12.png" /> <br />
+	<input onclick="uaktualnijIkone()" type="radio" name="ikona" id="ikona4" value="http://maps.google.com/mapfiles/kml/pal2/icon13.png"/><img style="border: 0;" alt="ikona4" src="http://maps.google.com/mapfiles/kml/pal2/icon13.png" /> 
+	<input onclick="uaktualnijIkone()" type="radio" name="ikona" id="ikona5"value="http://maps.google.com/mapfiles/kml/pal2/icon14.png"/><img style="border: 0;" alt="ikona5" src="http://maps.google.com/mapfiles/kml/pal2/icon14.png" /> <br />
+	<span class="opis">ikona</span>
+	</fieldset>
+	<input type="submit" value="DODAJ MARKER!" /><br>
+	<a href= "index.html"class="tilelinkhtml5">Powrót na stronę główną</a>
+	</form>
+	</div>
+	
+		<div id="map" style="width: 600px; height: 400px;"></div>
+	
+		<div style="clear: both;" ></div>
+	
+		<div class="rectangle">2015 &copy; Dariusz Michalczyk . <i class="icon-mail-alt"></i> <a href="mailto:d_michalczyk@poczta.wwsi.edu.pl "class="tilelinkhtml5">d_michalczyk@poczta.wwsi.edu.pl</div>
+	
+	</div>
+	
+	</body>
+
+</html>

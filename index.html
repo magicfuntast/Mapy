@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
+<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"pl-PL\">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>GŁÓWNA</title>
+	
+	<link rel="stylesheet" href="style.css" type="text/css" />
+	<link rel="stylesheet" href="css/fontello.css" type="text/css" />
+    <script src="http://maps.google.com/maps/api/js?sensor=false"type="text/javascript"></script>
+	
+	<script type="text/javascript">
+   
+	 function load() {
+      var map = new google.maps.Map(document.getElementById("map"), {
+        center: new google.maps.LatLng(52.348763181988076, 18.61083984375),
+        zoom: 5,
+        mapTypeId: 'hybrid'
+      });
+      
+    }
+	
+	function odliczanie()
+	{
+	var dzisiaj = new Date();
+		
+		var godzina = dzisiaj.getHours();
+		if (godzina<10) godzina = "0"+godzina;
+		
+		var minuta = dzisiaj.getMinutes();
+		if (minuta<10) minuta = "0"+minuta;
+		
+		var sekunda = dzisiaj.getSeconds();
+		if (sekunda<10) sekunda = "0"+sekunda;
+		
+		document.getElementById("zegar").innerHTML = godzina+":"+minuta+":"+sekunda;
+		 
+		 setTimeout("odliczanie()",1000);
+	}
+	
+ </script>
+ 
+  </head>
+	
+<body onload= "odliczanie();load();">
+	
+	<div id="container">
+	
+		<div class="reactangle">
+			<div id="logo"><a href="https://www.bandi.pl" class="tilelinkhtml5">BANDI</a></div>
+			<div id="zegar">12:00:00</div>
+			<div style="clear: both;"></div>
+		</div>
+	
+		<div class="square">
+		    <br><br>
+			<a href="pokazmarker.html"class="tilelinkhtml5">POKAŻ MARKERY</a>
+			<br><br>
+			<a href="dodajmarker.html"class="tilelinkhtml5">DODAJ SWOJE MARKERY</a>
+			<br><br>
+			<a href="pogoda.html"class="tilelinkhtml5">POGODA</a>
+			</div>
+	
+		<div id="map" style="width: 600px; height: 400px;"></div>
+	
+		<div style="clear: both;" ></div>
+	
+		<div class="rectangle">2015 &copy; Dariusz Michalczyk . <i class="icon-mail-alt"></i> <a href="mailto:d_michalczyk@poczta.wwsi.edu.pl "class="tilelinkhtml5">d_michalczyk@poczta.wwsi.edu.pl</div>
+	
+	</div>
+	
+	</body>
+
+</html>
